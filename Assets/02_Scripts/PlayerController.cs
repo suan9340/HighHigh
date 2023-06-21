@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private RaycastHit rayHit;
+    private RaycastHit hitInfo;
     private Ray ray;
 
     private Camera mainCam = null;
 
     [Header("RayCastStartPosition")]
     public Transform rayStartTrn = null;
+    public float maxRay = 100f;
 
     private void Start()
     {
@@ -19,9 +20,19 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        Debug.DrawRay(rayStartTrn.position, mainCam.transform.forward * 100, Color.red);
+        CheckHit();
+    }
+
+    private void CheckHit()
+    {
+        if (Physics.Raycast(rayStartTrn.position, mainCam.transform.forward, out hitInfo, maxRay))
+        {
+            Debug.Log(hitInfo.transform.name);
+        }
 
     }
 
-    
+
 
 }
