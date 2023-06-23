@@ -13,11 +13,15 @@ public class PlayerController : MonoBehaviour
     public Transform rayStartTrn = null;
     public float maxRay = 100f;
 
+    [Header("Particles")]
+    public GameObject lineEndParticle = null;
 
     private Camera mainCam = null;
     private LineRenderer myLineRen = null;
 
     private bool isShootLine = false;
+    private Vector3 playerEndVec = Vector3.zero;
+
     private void Start()
     {
         mainCam = Camera.main;
@@ -42,6 +46,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             isShootLine = false;
+            MovePlayer(playerEndVec);
             DontShootLineRenderer();
         }
     }
@@ -62,6 +67,8 @@ public class PlayerController : MonoBehaviour
     {
         if (Physics.Raycast(rayStartTrn.position, mainCam.transform.forward, out hitInfo, maxRay))
         {
+            lineEndParticle.transform.position = hitInfo.point;
+
             if (hitInfo.collider.CompareTag("Wall"))
             {
                 if (isShootLine)
@@ -70,7 +77,10 @@ public class PlayerController : MonoBehaviour
                 }
 
                 isShootLine = true;
-                MovePlayer(hitInfo.point);
+                playerEndVec = hitInfo.point;
+
+                lineEndParticle.SetActive(true);
+
             }
         }
 
