@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private bool isShootLine = false;
     private Vector3 playerEndVec = Vector3.zero;
 
+    private Vector3 dir = Vector3.zero;
     private void Start()
     {
         mainCam = Camera.main;
@@ -32,7 +33,12 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        InputKey();
+        //InputKey();
+        Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+
+        myLineRen.positionCount = 2;
+        myLineRen.SetPosition(0, rayStartTrn.position);
+        myLineRen.SetPosition(1, ray.direction * 100);
     }
 
     private void InputKey()
