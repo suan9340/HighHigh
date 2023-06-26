@@ -20,14 +20,15 @@ public class PlayerController : MonoBehaviour
     [Header("Particles")]
     public GameObject lineEndParticle = null;
 
+    [Header("PlayerMoveSpeed")]
+    public float playerMoveSpeed = 3f;
+
     private bool isShootLine = false;
     private Vector3 playerEndVec = Vector3.zero;
 
     // Cashing
     private Camera mainCam = null;
     private LineRenderer myLineRen = null;
-
-    public GameObject wall;
 
     private void Start()
     {
@@ -52,6 +53,7 @@ public class PlayerController : MonoBehaviour
         {
             if (!isShootLine)
             {
+                lineEndParticle.SetActive(true);
                 myLineRen.positionCount = 2;
             }
 
@@ -62,6 +64,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
+            CheckHit();
             isShootLine = false;
             MovePlayer(playerEndVec);
             DontShootLineRenderer();
@@ -71,6 +74,7 @@ public class PlayerController : MonoBehaviour
     private void DontShootLineRenderer()
     {
         myLineRen.positionCount = 0;
+        lineEndParticle.SetActive(false);
     }
 
     private void CheckHit()
@@ -96,13 +100,23 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer(Vector3 _endPos)
     {
-        Debug.Log(_endPos);
-
-        //Instantiate(wall, _endPos, Quaternion.identity);
-        transform.position = _endPos;
-
+        //transform.position = _endPos;
+        StartCoroutine(PlayerSlerpMove(_endPos));
     }
 
+    private IEnumerator PlayerSlerpMove(Vector3 _targetPos)
+    {
+        var _curTime = 0f;
+        while (_curTime < playerMoveSpeed)
+        {
+            _curTime += Time.deltaTime;
+            transform.position = Vector3.Slerp(transform.position, _targetPos, _curTime / playerMoveSpeed);
 
+            yield return null;
+        }
 
+        transform.position = _targetPos;
+
+        yield return null;
+    }
 }
