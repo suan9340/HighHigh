@@ -10,4 +10,11 @@ public static class DefineManager
         Moving,
         EnemyHit,
     }
+
+    public enum GameState
+    {
+        Setting,
+        Playing,
+        Quit,
+    }
 }

@@ -6,17 +6,34 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class PlayerController : MonoBehaviour
 {
+    // RayCast
     private RaycastHit hitInfo;
     private Ray ray;
 
     private Vector3 rayOrigin = Vector3.zero;
     private Vector3 rayDir = Vector3.zero;
 
-    [Header("Player States")]
+    private bool isShootLine = false;
+    private Vector3 playerEndVec = Vector3.zero;
+
+
+    // CameraMoving
+    private float rotationY = 0f;
+    private float rotationX = 0f;
+
+
+
+    // Cashing
+    private Camera mainCam = null;
+    private LineRenderer myLineRen = null;
+
+
+    [Header("[[ Player States ]]")]
     public DefineManager.PlayerState playerState = DefineManager.PlayerState.Idle;
 
 
-    [Space(20)]
+    [Space(30)]
+    [Header("[[ Rays Info ]]")]
     [Header("RayCastStartPosition")]
     public Transform rayStartTrn = null;
     public float maxRay = 100f;
@@ -26,29 +43,21 @@ public class PlayerController : MonoBehaviour
 
 
     [Space(30)]
-    [Header("PlayerMoveSpeed")]
+    [Header("[[ Speeds ]]")]
     public float playerMoveSpeed = 3f;
-
-    [Header("EnemyMoveSpeed")]
     public float enemyMoveSpeed = 2f;
 
-    private bool isShootLine = false;
-    private Vector3 playerEndVec = Vector3.zero;
 
-    // Cashing
-    private Camera mainCam = null;
-    private LineRenderer myLineRen = null;
+    [Space(30)]
+    [Header("Player Settings")]
+    public float sensitivity = 5f;
+
+
+    public GameObject aaaaaaa = null;
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        mainCam = Camera.main;
-        myLineRen = GetComponent<LineRenderer>();
-        lineEndParticle.SetActive(true);
-
-        DontShootLineRenderer();
+        FirstSetting();
     }
 
     private void Update()
@@ -58,7 +67,34 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        CameraMoveRotation();
         InputKey();
+    }
+
+    #region PlayerCameraRotation
+    private void CameraMoveRotation()
+    {
+        float _mouseY = Input.GetAxis("Mouse Y") * sensitivity;
+        float _mouseX = Input.GetAxis("Mouse X") * sensitivity;
+
+        rotationY -= _mouseY;
+        rotationY = Mathf.Clamp(rotationY, -90f, 90f);
+
+        rotationX = mainCam.transform.eulerAngles.y + _mouseX;
+        mainCam.transform.eulerAngles = new Vector3(rotationY, rotationX, 0);
+    }
+    #endregion
+
+    private void FirstSetting()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        mainCam = Camera.main;
+        myLineRen = GetComponent<LineRenderer>();
+        lineEndParticle.SetActive(true);
+
+        DontShootLineRenderer();
     }
 
     private void InputKey()
@@ -123,7 +159,10 @@ public class PlayerController : MonoBehaviour
     #region PlayerMove
     private void MovePlayer(Vector3 _endPos)
     {
-        StartCoroutine(ObjectMoveToObject(gameObject, transform.position, _endPos, playerMoveSpeed));
+        aaaaaaa = EnemyManager.Instance.NearEnemyCheck();
+        mainCam.transform.LookAt(aaaaaaa.transform.position);
+
+        StartCoroutine(ObjectMoveToObjectSLerp(gameObject, transform.position, _endPos, playerMoveSpeed));
     }
     #endregion
 
@@ -131,13 +170,31 @@ public class PlayerController : MonoBehaviour
     #region EnemyCatch
     private void EnemyMove(GameObject _enemy)
     {
-        StartCoroutine(ObjectMoveToObject(_enemy, _enemy.transform.position, rayStartTrn.transform.position, enemyMoveSpeed));
+        StartCoroutine(ObjectMoveToObjectLerp(_enemy, _enemy.transform.position, rayStartTrn.transform.position, enemyMoveSpeed));
     }
 
     #endregion
 
+    #region Lerp Y Slerp Movement Function
+    private IEnumerator ObjectMoveToObjectLerp(GameObject _obj, Vector3 _startPos, Vector3 _endPos, float _time)
+    {
+        playerState = DefineManager.PlayerState.Moving;
+        var _curTime = 0f;
+        while (_curTime < _time)
+        {
+            _curTime += Time.deltaTime;
+            _obj.transform.position = Vector3.Lerp(_startPos, _endPos, _curTime / _time);
 
-    private IEnumerator ObjectMoveToObject(GameObject _obj, Vector3 _startPos, Vector3 _endPos, float _time)
+            yield return null;
+        }
+
+        _obj.transform.position = _endPos;
+        playerState = DefineManager.PlayerState.Idle;
+
+        yield break;
+    }
+
+    private IEnumerator ObjectMoveToObjectSLerp(GameObject _obj, Vector3 _startPos, Vector3 _endPos, float _time)
     {
         playerState = DefineManager.PlayerState.Moving;
         var _curTime = 0f;
@@ -154,5 +211,5 @@ public class PlayerController : MonoBehaviour
 
         yield break;
     }
-
+    #endregion
 }

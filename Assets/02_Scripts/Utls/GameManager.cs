@@ -25,4 +25,6 @@ public class GameManager : MonoBehaviour
 
 
     #endregion
+
+    public DefineManager.GameState gameState = DefineManager.GameState.Playing;
 }
