@@ -1351,6 +1351,7 @@ GameObject:
   - component: {fileID: 1728751302}
   - component: {fileID: 1728751301}
   - component: {fileID: 1728751303}
+  - component: {fileID: 1728751304}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1390,7 +1391,7 @@ MonoBehaviour:
   rayStartTrn: {fileID: 930262143}
   maxRay: 100
   lineEndParticle: {fileID: 1773076307}
-  _obj: {fileID: 2756972278269179807, guid: a0c4220ae317a0b42ad88c4745d1d64f, type: 3}
+  wall: {fileID: 2756972278269179807, guid: a0c4220ae317a0b42ad88c4745d1d64f, type: 3}
 --- !u!54 &1728751302
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1504,6 +1505,20 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+--- !u!114 &1728751304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728751299}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e688638be6af9f4fa3e9f17813cf361, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distance: 100
+  lineEndParticle: {fileID: 1773076307}
 --- !u!1 &1773076307
 GameObject:
   m_ObjectHideFlags: 0
