@@ -12,7 +12,11 @@ public class PlayerController : MonoBehaviour
     private Vector3 rayOrigin = Vector3.zero;
     private Vector3 rayDir = Vector3.zero;
 
+    [Header("Player States")]
+    public DefineManager.PlayerState playerState = DefineManager.PlayerState.Idle;
 
+
+    [Space(20)]
     [Header("RayCastStartPosition")]
     public Transform rayStartTrn = null;
     public float maxRay = 100f;
@@ -20,8 +24,13 @@ public class PlayerController : MonoBehaviour
     [Header("Particles")]
     public GameObject lineEndParticle = null;
 
+
+    [Space(30)]
     [Header("PlayerMoveSpeed")]
     public float playerMoveSpeed = 3f;
+
+    [Header("EnemyMoveSpeed")]
+    public float enemyMoveSpeed = 2f;
 
     private bool isShootLine = false;
     private Vector3 playerEndVec = Vector3.zero;
@@ -44,6 +53,11 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (playerState == DefineManager.PlayerState.Moving)
+        {
+            return;
+        }
+
         InputKey();
     }
 
@@ -61,12 +75,12 @@ public class PlayerController : MonoBehaviour
 
             CheckHit();
         }
-
         if (Input.GetMouseButtonUp(0))
         {
-            CheckHit();
             isShootLine = false;
-            MovePlayer(playerEndVec);
+
+            CheckHit();
+
             DontShootLineRenderer();
         }
     }
@@ -84,12 +98,20 @@ public class PlayerController : MonoBehaviour
 
         if (Physics.Raycast(rayOrigin, rayDir, out hitInfo, maxRay))
         {
-            if (hitInfo.collider.CompareTag("Wall"))
+            if (!isShootLine)
             {
-
+                if (hitInfo.collider.CompareTag("Wall"))
+                {
+                    Debug.Log("Wall!!");
+                    playerEndVec = hitInfo.point;
+                    MovePlayer(playerEndVec);
+                }
+                if (hitInfo.collider.CompareTag("Enemy"))
+                {
+                    Debug.Log("Enemy!!");
+                    EnemyMove(hitInfo.transform.gameObject);
+                }
             }
-
-            playerEndVec = hitInfo.point;
         }
 
         lineEndParticle.transform.position = hitInfo.point;
@@ -98,25 +120,39 @@ public class PlayerController : MonoBehaviour
         myLineRen.SetPosition(1, hitInfo.point);
     }
 
+    #region PlayerMove
     private void MovePlayer(Vector3 _endPos)
     {
-        //transform.position = _endPos;
-        StartCoroutine(PlayerSlerpMove(_endPos));
+        StartCoroutine(ObjectMoveToObject(gameObject, transform.position, _endPos, playerMoveSpeed));
+    }
+    #endregion
+
+
+    #region EnemyCatch
+    private void EnemyMove(GameObject _enemy)
+    {
+        StartCoroutine(ObjectMoveToObject(_enemy, _enemy.transform.position, rayStartTrn.transform.position, enemyMoveSpeed));
     }
 
-    private IEnumerator PlayerSlerpMove(Vector3 _targetPos)
+    #endregion
+
+
+    private IEnumerator ObjectMoveToObject(GameObject _obj, Vector3 _startPos, Vector3 _endPos, float _time)
     {
+        playerState = DefineManager.PlayerState.Moving;
         var _curTime = 0f;
-        while (_curTime < playerMoveSpeed)
+        while (_curTime < _time)
         {
             _curTime += Time.deltaTime;
-            transform.position = Vector3.Slerp(transform.position, _targetPos, _curTime / playerMoveSpeed);
+            _obj.transform.position = Vector3.Slerp(_startPos, _endPos, _curTime / _time);
 
             yield return null;
         }
 
-        transform.position = _targetPos;
+        _obj.transform.position = _endPos;
+        playerState = DefineManager.PlayerState.Idle;
 
-        yield return null;
+        yield break;
     }
+
 }

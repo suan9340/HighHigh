@@ -4,8 +4,10 @@ using UnityEngine;
 
 public static class DefineManager
 {
-    public enum PlayerIdle
+    public enum PlayerState
     {
-
+        Idle,
+        Moving,
+        EnemyHit,
     }
 }
