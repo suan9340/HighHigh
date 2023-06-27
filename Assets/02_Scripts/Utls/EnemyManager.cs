@@ -43,8 +43,6 @@ public class EnemyManager : MonoBehaviour
     {
         CheckingNull();
         SetListEnemy();
-
-        CheckingPlayerYEnemysDistance();
     }
 
     private void CheckingNull()

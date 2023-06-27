@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
     public float sensitivity = 5f;
 
 
-    public GameObject aaaaaaa = null;
+    public GameObject nearEnemy = null;
 
     private void Start()
     {
@@ -159,8 +159,8 @@ public class PlayerController : MonoBehaviour
     #region PlayerMove
     private void MovePlayer(Vector3 _endPos)
     {
-        aaaaaaa = EnemyManager.Instance.NearEnemyCheck();
-        mainCam.transform.LookAt(aaaaaaa.transform.position);
+
+
 
         StartCoroutine(ObjectMoveToObjectSLerp(gameObject, transform.position, _endPos, playerMoveSpeed));
     }
@@ -202,14 +202,27 @@ public class PlayerController : MonoBehaviour
         {
             _curTime += Time.deltaTime;
             _obj.transform.position = Vector3.Slerp(_startPos, _endPos, _curTime / _time);
-
             yield return null;
         }
 
         _obj.transform.position = _endPos;
-        playerState = DefineManager.PlayerState.Idle;
+        nearEnemy = EnemyManager.Instance.NearEnemyCheck();
 
-        yield break;
+
+        _curTime = 0f;
+        while (_curTime < 1)
+        {
+            _curTime += Time.deltaTime;
+            mainCam.transform.rotation = Quaternion.Lerp(mainCam.transform.rotation, nearEnemy.transform.rotation, _curTime / _time);
+            yield return null;
+        }
+
+        //mainCam.transform.LookAt(nearEnemy.transform.position);
+
+
+        playerState = DefineManager.PlayerState.Idle;
+        yield return null;
     }
+
     #endregion
 }
