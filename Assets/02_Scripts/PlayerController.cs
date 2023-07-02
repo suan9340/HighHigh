@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -23,9 +24,15 @@ public class PlayerController : MonoBehaviour
 
 
 
+    // PlayerMoving
+    private Transform startPos;
+    private Transform endPos;
+
+
     // Cashing
     private Camera mainCam = null;
     private LineRenderer myLineRen = null;
+    private Rigidbody myrigid = null;
 
 
     [Header("[[ Player States ]]")]
@@ -58,6 +65,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         FirstSetting();
+        PlayerDOmOve();
     }
 
     private void Update()
@@ -91,7 +99,10 @@ public class PlayerController : MonoBehaviour
         Cursor.visible = false;
 
         mainCam = Camera.main;
+
         myLineRen = GetComponent<LineRenderer>();
+        myrigid = GetComponent<Rigidbody>();
+
         lineEndParticle.SetActive(true);
 
         DontShootLineRenderer();
@@ -121,6 +132,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void PlayerDOmOve()
+    {
+
+    }
     private void DontShootLineRenderer()
     {
         myLineRen.positionCount = 0;
@@ -159,9 +174,6 @@ public class PlayerController : MonoBehaviour
     #region PlayerMove
     private void MovePlayer(Vector3 _endPos)
     {
-
-
-
         StartCoroutine(ObjectMoveToObjectSLerp(gameObject, transform.position, _endPos, playerMoveSpeed));
     }
     #endregion
