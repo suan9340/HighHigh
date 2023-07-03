@@ -34,6 +34,11 @@ public class PlayerController : MonoBehaviour
     private LineRenderer myLineRen = null;
     private Rigidbody myrigid = null;
 
+    // parabolic movement
+    private Vector3 sunrise; //포물선 시작위치
+    public Vector3 sunset; //포물선 종료위치
+    private float startTime;
+
 
     [Header("[[ Player States ]]")]
     public DefineManager.PlayerState playerState = DefineManager.PlayerState.Idle;
@@ -59,6 +64,11 @@ public class PlayerController : MonoBehaviour
     [Header("Player Settings")]
     public float sensitivity = 5f;
 
+
+    [Space(30)]
+    [Header("Parabolic Movement")]
+    public float journeyTime = 1.0F;
+    public float reduceHeight = 1f;
 
     public GameObject nearEnemy = null;
 
@@ -174,7 +184,10 @@ public class PlayerController : MonoBehaviour
     #region PlayerMove
     private void MovePlayer(Vector3 _endPos)
     {
-        StartCoroutine(ObjectMoveToObjectSLerp(gameObject, transform.position, _endPos, playerMoveSpeed));
+        //StartCoroutine(ObjectMoveToObjectSLerp(gameObject, transform.position, _endPos, playerMoveSpeed));
+        sunrise = transform.position;
+        sunset = _endPos;
+        StartCoroutine(MovePlayerPlablor());
     }
     #endregion
 
@@ -237,4 +250,58 @@ public class PlayerController : MonoBehaviour
     }
 
     #endregion
+
+
+    #region Player ParaBolic MoveMent
+    private IEnumerator MovePlayerPlablor()
+    {
+        //startTime = Time.time;
+
+        //while (true)
+        //{
+        //    if (transform.position == sunset)
+        //    {
+        //        yield break;
+        //    }
+
+        //    Vector3 center = (sunrise + sunset) * 0.5F; //Center 값만큼 위로 올라간다.
+        //    center -= new Vector3(0, 1f * reduceHeight, 0); //y값을 높이면 높이가 낮아진다.
+
+        //    Vector3 riseRelCenter = sunrise - center;
+        //    Vector3 setRelCenter = sunset - center;
+
+        //    float fracComplete = (Time.time - startTime) / journeyTime;
+
+        //    transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, fracComplete);
+        //    transform.position += center;
+        //    yield return null;
+        //}
+
+
+        var _curTime = 0f;
+
+
+        while (_curTime < journeyTime)
+        {
+            _curTime += Time.deltaTime;
+
+            if (transform.position == sunset)
+            {
+                yield break;
+            }
+
+            Vector3 center = (sunrise + sunset) * 0.5F; //Center 값만큼 위로 올라간다.
+            center -= new Vector3(0, 1f * reduceHeight, 0); //y값을 높이면 높이가 낮아진다.
+
+            Vector3 riseRelCenter = sunrise - center;
+            Vector3 setRelCenter = sunset - center;
+
+            transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, _curTime / journeyTime);
+            transform.position += center;
+            yield return null;
+        }
+    }
+    #endregion
+
+
 }
