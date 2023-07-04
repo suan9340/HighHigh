@@ -147,6 +147,9 @@ public class PlayerController : MonoBehaviour
         XParticle.SetActive(false);
     }
 
+    #region PlayerRayCheck
+
+   
     private void CheckHit()
     {
         rayOrigin = mainCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
@@ -188,12 +191,14 @@ public class PlayerController : MonoBehaviour
 
     private void PlayerRayEndParticle()
     {
+        if (hitInfo.collider == null)
+            return;
+
         if (hitInfo.collider.name == "FakeWall")
         {
             if (CircleParticle.activeSelf)
             {
-                CircleParticle.SetActive(false);
-                XParticle.SetActive(true);
+                SettingParticle(CircleParticle, XParticle);
             }
 
             XParticle.transform.position = hitInfo.point;
@@ -202,13 +207,19 @@ public class PlayerController : MonoBehaviour
         {
             if (XParticle.activeSelf)
             {
-                XParticle.SetActive(false);
-                CircleParticle.SetActive(true);
+                SettingParticle(XParticle, CircleParticle);
             }
 
             CircleParticle.transform.position = hitInfo.point;
         }
     }
+
+    private void SettingParticle(GameObject _a, GameObject _b)
+    {
+        _a.SetActive(false);
+        _b.SetActive(true);
+    }
+    #endregion
 
     #region PlayerMove
     private void MovePlayer(Vector3 _endPos)
@@ -219,7 +230,6 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(MovePlayerPlablor());
     }
     #endregion
-
 
     #region EnemyCatch
     private void EnemyMove(GameObject _enemy)
