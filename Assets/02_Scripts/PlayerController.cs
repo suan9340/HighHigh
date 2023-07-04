@@ -51,7 +51,8 @@ public class PlayerController : MonoBehaviour
     public float maxRay = 100f;
 
     [Header("Particles")]
-    public GameObject lineEndParticle = null;
+    public GameObject CircleParticle = null;
+    public GameObject XParticle = null;
 
 
     [Space(30)]
@@ -75,7 +76,6 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         FirstSetting();
-        PlayerDOmOve();
     }
 
     private void Update()
@@ -113,8 +113,6 @@ public class PlayerController : MonoBehaviour
         myLineRen = GetComponent<LineRenderer>();
         myrigid = GetComponent<Rigidbody>();
 
-        lineEndParticle.SetActive(true);
-
         DontShootLineRenderer();
     }
 
@@ -124,7 +122,7 @@ public class PlayerController : MonoBehaviour
         {
             if (!isShootLine)
             {
-                lineEndParticle.SetActive(true);
+                CircleParticle.SetActive(true);
                 myLineRen.positionCount = 2;
             }
 
@@ -142,14 +140,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void PlayerDOmOve()
-    {
-
-    }
     private void DontShootLineRenderer()
     {
         myLineRen.positionCount = 0;
-        lineEndParticle.SetActive(false);
+        CircleParticle.SetActive(false);
+        XParticle.SetActive(false);
     }
 
     private void CheckHit()
@@ -157,28 +152,62 @@ public class PlayerController : MonoBehaviour
         rayOrigin = mainCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
         rayDir = mainCam.transform.forward;
 
+        Debug.DrawRay(rayOrigin, rayDir * 1000f, Color.red);
         if (Physics.Raycast(rayOrigin, rayDir, out hitInfo, maxRay))
         {
             if (!isShootLine)
             {
-                if (hitInfo.collider.CompareTag("Wall"))
-                {
-                    Debug.Log("Wall!!");
-                    playerEndVec = hitInfo.point;
-                    MovePlayer(playerEndVec);
-                }
-                if (hitInfo.collider.CompareTag("Enemy"))
-                {
-                    Debug.Log("Enemy!!");
-                    EnemyMove(hitInfo.transform.gameObject);
-                }
+                CheckHitObject();
             }
         }
 
-        lineEndParticle.transform.position = hitInfo.point;
+        PlayerRayEndParticle();
 
         myLineRen.SetPosition(0, rayStartTrn.position);
         myLineRen.SetPosition(1, hitInfo.point);
+    }
+
+    private void CheckHitObject()
+    {
+        if (hitInfo.collider.CompareTag("Wall"))
+        {
+            Debug.Log("Wall!!");
+            playerEndVec = hitInfo.point;
+            MovePlayer(playerEndVec);
+        }
+        if (hitInfo.collider.CompareTag("Enemy"))
+        {
+            Debug.Log("Enemy!!");
+            EnemyMove(hitInfo.transform.gameObject);
+        }
+        if (hitInfo.collider.CompareTag("FakeWall"))
+        {
+            Debug.Log("Fake Wall!!");
+        }
+    }
+
+    private void PlayerRayEndParticle()
+    {
+        if (hitInfo.collider.name == "FakeWall")
+        {
+            if (CircleParticle.activeSelf)
+            {
+                CircleParticle.SetActive(false);
+                XParticle.SetActive(true);
+            }
+
+            XParticle.transform.position = hitInfo.point;
+        }
+        else
+        {
+            if (XParticle.activeSelf)
+            {
+                XParticle.SetActive(false);
+                CircleParticle.SetActive(true);
+            }
+
+            CircleParticle.transform.position = hitInfo.point;
+        }
     }
 
     #region PlayerMove
@@ -198,12 +227,11 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(ObjectMoveToObjectLerp(_enemy, _enemy.transform.position, rayStartTrn.transform.position, enemyMoveSpeed));
     }
 
-    #endregion
-
-    #region Lerp Y Slerp Movement Function
     private IEnumerator ObjectMoveToObjectLerp(GameObject _obj, Vector3 _startPos, Vector3 _endPos, float _time)
     {
         playerState = DefineManager.PlayerState.Moving;
+
+        _obj.transform.LookAt(gameObject.transform);
         var _curTime = 0f;
         while (_curTime < _time)
         {
@@ -215,11 +243,17 @@ public class PlayerController : MonoBehaviour
 
         _obj.transform.position = _endPos;
 
-        Destroy(_obj);
+        _obj.GetComponent<Animator>().SetTrigger("isDie");
         playerState = DefineManager.PlayerState.Idle;
 
         yield break;
     }
+
+    #endregion
+
+    #region Lerp Y Slerp Movement Function
+
+
 
     private IEnumerator ObjectMoveToObjectSLerp(GameObject _obj, Vector3 _startPos, Vector3 _endPos, float _time)
     {
@@ -252,7 +286,6 @@ public class PlayerController : MonoBehaviour
     }
 
     #endregion
-
 
     #region Player ParaBolic MoveMent
     private IEnumerator MovePlayerPlablor()
