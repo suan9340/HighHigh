@@ -14,7 +14,6 @@ public class PlayerController : MonoBehaviour
     private Vector3 rayOrigin = Vector3.zero;
     private Vector3 rayDir = Vector3.zero;
 
-    private bool isShootLine = false;
     private Vector3 playerEndVec = Vector3.zero;
 
 
@@ -36,7 +35,7 @@ public class PlayerController : MonoBehaviour
 
     // parabolic movement
     private Vector3 sunrise; //포물선 시작위치
-    public Vector3 sunset; //포물선 종료위치
+    private Vector3 sunset; //포물선 종료위치
     private float startTime;
 
 
@@ -72,7 +71,7 @@ public class PlayerController : MonoBehaviour
     public float reduceHeight = 1f;
 
     public GameObject nearEnemy = null;
-    private string colString = "";
+    public string colString = "";
 
     private void Start()
     {
@@ -123,14 +122,10 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            isShootLine = true;
-
             CheckHit();
         }
         if (Input.GetMouseButtonUp(0))
         {
-            isShootLine = false;
-
             MouseUPCheck();
             DontShootLineRenderer();
         }
@@ -143,6 +138,8 @@ public class PlayerController : MonoBehaviour
 
         CircleParticle.SetActive(false);
         XParticle.SetActive(false);
+
+        colString = "";
     }
 
     #region PlayerRayCheck
@@ -216,8 +213,11 @@ public class PlayerController : MonoBehaviour
 
     private void PlayerRayEndParticle()
     {
-        if (hitInfo.collider == null || colString != null)
+        if (hitInfo.collider == null || colString == "")
+        {
+            Debug.Log("qwe");
             return;
+        }
 
         switch (colString)
         {
@@ -240,33 +240,8 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("QUE!???!!?");
                 break;
         }
-
-        //if (hitInfo.collider.name == "FakeWall")
-        //{
-        //    if (CircleParticle.activeSelf)
-        //    {
-        //        Debug.Log("qwe");
-        //        SettingParticle(CircleParticle, XParticle);
-        //    }
-
-        //    XParticle.transform.position = hitInfo.point;
-        //}
-        //else
-        //{
-        //    if (XParticle.activeSelf)
-        //    {
-        //        SettingParticle(XParticle, CircleParticle);
-        //    }
-
-        //    CircleParticle.transform.position = hitInfo.point;
-        //}
     }
 
-    private void SettingParticle(GameObject _a, GameObject _b)
-    {
-        _a.SetActive(false);
-        _b.SetActive(true);
-    }
     #endregion
 
     #region PlayerMove
