@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
     public float reduceHeight = 1f;
 
     public GameObject nearEnemy = null;
+    private string colString = "";
 
     private void Start()
     {
@@ -113,6 +114,8 @@ public class PlayerController : MonoBehaviour
         myLineRen = GetComponent<LineRenderer>();
         myrigid = GetComponent<Rigidbody>();
 
+        myLineRen.positionCount = 2;
+
         DontShootLineRenderer();
     }
 
@@ -120,12 +123,6 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            if (!isShootLine)
-            {
-                CircleParticle.SetActive(true);
-                myLineRen.positionCount = 2;
-            }
-
             isShootLine = true;
 
             CheckHit();
@@ -134,34 +131,32 @@ public class PlayerController : MonoBehaviour
         {
             isShootLine = false;
 
-            CheckHit();
-
+            MouseUPCheck();
             DontShootLineRenderer();
         }
     }
 
     private void DontShootLineRenderer()
     {
-        myLineRen.positionCount = 0;
+        myLineRen.SetPosition(0, Vector3.zero);
+        myLineRen.SetPosition(1, Vector3.zero);
+
         CircleParticle.SetActive(false);
         XParticle.SetActive(false);
     }
 
     #region PlayerRayCheck
 
-   
+
     private void CheckHit()
     {
         rayOrigin = mainCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
         rayDir = mainCam.transform.forward;
 
-        Debug.DrawRay(rayOrigin, rayDir * 1000f, Color.red);
+        Debug.DrawRay(rayOrigin, rayDir * 100f, Color.red);
         if (Physics.Raycast(rayOrigin, rayDir, out hitInfo, maxRay))
         {
-            if (!isShootLine)
-            {
-                CheckHitObject();
-            }
+            CheckHitObject();
         }
 
         PlayerRayEndParticle();
@@ -174,44 +169,97 @@ public class PlayerController : MonoBehaviour
     {
         if (hitInfo.collider.CompareTag("Wall"))
         {
-            Debug.Log("Wall!!");
-            playerEndVec = hitInfo.point;
-            MovePlayer(playerEndVec);
+            if (colString == "Wall")
+                return;
+
+            colString = "Wall";
+
         }
         if (hitInfo.collider.CompareTag("Enemy"))
         {
-            Debug.Log("Enemy!!");
-            EnemyMove(hitInfo.transform.gameObject);
+            if (colString == "Enemy")
+                return;
+
+            colString = "Enemy";
         }
         if (hitInfo.collider.CompareTag("FakeWall"))
         {
-            Debug.Log("Fake Wall!!");
+            if (colString == "FakeWall")
+                return;
+
+            colString = "FakeWall";
+        }
+    }
+
+    private void MouseUPCheck()
+    {
+        switch (colString)
+        {
+            case "Wall":
+                playerEndVec = hitInfo.point;
+                MovePlayer(playerEndVec);
+                break;
+
+            case "Enemy":
+                EnemyMove(hitInfo.transform.gameObject);
+                break;
+
+            case "FakeWall":
+
+                break;
+
+            default:
+                Debug.Log("QUE!???!!?");
+                break;
         }
     }
 
     private void PlayerRayEndParticle()
     {
-        if (hitInfo.collider == null)
+        if (hitInfo.collider == null || colString != null)
             return;
 
-        if (hitInfo.collider.name == "FakeWall")
+        switch (colString)
         {
-            if (CircleParticle.activeSelf)
-            {
-                SettingParticle(CircleParticle, XParticle);
-            }
+            case "Wall":
+            case "Enemy":
+                CircleParticle.SetActive(true);
+                XParticle.SetActive(false);
 
-            XParticle.transform.position = hitInfo.point;
-        }
-        else
-        {
-            if (XParticle.activeSelf)
-            {
-                SettingParticle(XParticle, CircleParticle);
-            }
+                CircleParticle.transform.position = hitInfo.point;
+                break;
 
-            CircleParticle.transform.position = hitInfo.point;
+            case "FakeWall":
+                CircleParticle.SetActive(false);
+                XParticle.SetActive(true);
+
+                XParticle.transform.position = hitInfo.point;
+                break;
+
+            default:
+                Debug.Log("QUE!???!!?");
+                break;
         }
+
+        //if (hitInfo.collider.name == "FakeWall")
+        //{
+        //    if (CircleParticle.activeSelf)
+        //    {
+        //        Debug.Log("qwe");
+        //        SettingParticle(CircleParticle, XParticle);
+        //    }
+
+        //    XParticle.transform.position = hitInfo.point;
+        //}
+        //else
+        //{
+        //    if (XParticle.activeSelf)
+        //    {
+        //        SettingParticle(XParticle, CircleParticle);
+        //    }
+
+        //    CircleParticle.transform.position = hitInfo.point;
+        //}
     }
 
     private void SettingParticle(GameObject _a, GameObject _b)
