@@ -42,6 +42,9 @@ public class PlayerController : MonoBehaviour
     [Header("[[ Player States ]]")]
     public DefineManager.PlayerState playerState = DefineManager.PlayerState.Idle;
 
+    [Header("[[ Player Settings ]]")]
+    public float sensitivity = 5f;
+
 
     [Space(30)]
     [Header("[[ Rays Info ]]")]
@@ -49,7 +52,7 @@ public class PlayerController : MonoBehaviour
     public Transform rayStartTrn = null;
     public float maxRay = 100f;
 
-    [Header("Particles")]
+    [Header("[[ Particles ]]")]
     public GameObject CircleParticle = null;
     public GameObject XParticle = null;
 
@@ -60,18 +63,18 @@ public class PlayerController : MonoBehaviour
     public float enemyMoveSpeed = 2f;
 
 
-    [Space(30)]
-    [Header("Player Settings")]
-    public float sensitivity = 5f;
-
 
     [Space(30)]
-    [Header("Parabolic Movement")]
-    public float journeyTime = 1.0F;
+    [Header("[[ Parabolic Movement ]]")]
+    public float playerMoveTime = 1.0F;
     public float reduceHeight = 1f;
-
     public GameObject nearEnemy = null;
     public string colString = "";
+
+
+    [Space(30)]
+    [Header("[[ Player Shoot Line ]]")]
+    public LineRenderer shootLine = null;
 
     private void Start()
     {
@@ -126,7 +129,7 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(0))
         {
-            MouseUPCheck();
+            MouseUPCheckY();
             DontShootLineRenderer();
         }
     }
@@ -135,6 +138,9 @@ public class PlayerController : MonoBehaviour
     {
         myLineRen.SetPosition(0, Vector3.zero);
         myLineRen.SetPosition(1, Vector3.zero);
+
+        shootLine.SetPosition(0, Vector3.zero);
+        shootLine.SetPosition(1, Vector3.zero);
 
         CircleParticle.SetActive(false);
         XParticle.SetActive(false);
@@ -188,7 +194,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void MouseUPCheck()
+    private void MouseUPCheckY()
     {
         switch (colString)
         {
@@ -247,11 +253,64 @@ public class PlayerController : MonoBehaviour
     #region PlayerMove
     private void MovePlayer(Vector3 _endPos)
     {
-        //StartCoroutine(ObjectMoveToObjectSLerp(gameObject, transform.position, _endPos, playerMoveSpeed));
         sunrise = transform.position;
         sunset = _endPos;
         StartCoroutine(MovePlayerPlablor());
     }
+
+    private IEnumerator MovePlayerPlablor()
+    {
+        playerState = DefineManager.PlayerState.Moving;
+
+        SettingShootLine();
+        var _curTime = 0f;
+
+
+        while (_curTime < playerMoveTime)
+        {
+            _curTime += Time.deltaTime;
+
+            if (transform.position == sunset)
+            {
+                yield break;
+            }
+
+            Vector3 center = (sunrise + sunset) * 0.5F; //Center 값만큼 위로 올라간다.
+            center -= new Vector3(0, 1f * reduceHeight, 0); //y값을 높이면 높이가 낮아진다.
+
+            Vector3 riseRelCenter = sunrise - center;
+            Vector3 setRelCenter = sunset - center;
+
+            transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, _curTime / playerMoveTime);
+            transform.position += center;
+            shootLine.SetPosition(0, rayStartTrn.transform.position);
+            yield return null;
+        }
+
+        shootLine.SetPosition(0, Vector3.zero);
+        shootLine.SetPosition(1, Vector3.zero);
+
+        yield return PlayerRotationToEnemy();
+    }
+
+    private IEnumerator PlayerRotationToEnemy()
+    {
+        var _curTime = 0f;
+
+        nearEnemy = EnemyManager.Instance.NearEnemyCheck();
+
+        while (_curTime < 1)
+        {
+            _curTime += Time.deltaTime;
+            mainCam.transform.rotation = Quaternion.Lerp(mainCam.transform.rotation, nearEnemy.transform.rotation, _curTime / 1);
+            yield return null;
+        }
+        playerState = DefineManager.PlayerState.Idle;
+
+        yield return null;
+    }
+
+
     #endregion
 
     #region EnemyCatch
@@ -284,72 +343,14 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #region Lerp Y Slerp Movement Function
+    #region Shoot a Line
 
-
-
-    private IEnumerator ObjectMoveToObjectSLerp(GameObject _obj, Vector3 _startPos, Vector3 _endPos, float _time)
+    private void SettingShootLine()
     {
-        playerState = DefineManager.PlayerState.Moving;
-        var _curTime = 0f;
-        while (_curTime < _time)
-        {
-            _curTime += Time.deltaTime;
-            _obj.transform.position = Vector3.Slerp(_startPos, _endPos, _curTime / _time);
-            yield return null;
-        }
-
-        _obj.transform.position = _endPos;
-        nearEnemy = EnemyManager.Instance.NearEnemyCheck();
-
-
-        _curTime = 0f;
-        while (_curTime < 1)
-        {
-            _curTime += Time.deltaTime;
-            mainCam.transform.rotation = Quaternion.Lerp(mainCam.transform.rotation, nearEnemy.transform.rotation, _curTime / _time);
-            yield return null;
-        }
-
-        //mainCam.transform.LookAt(nearEnemy.transform.position);
-
-
-        playerState = DefineManager.PlayerState.Idle;
-        yield return null;
+        shootLine.positionCount = 2;
+        shootLine.SetPosition(0, rayStartTrn.transform.position);
+        shootLine.SetPosition(1, hitInfo.transform.position);
     }
 
     #endregion
-
-    #region Player ParaBolic MoveMent
-    private IEnumerator MovePlayerPlablor()
-    {
-        playerState = DefineManager.PlayerState.Moving;
-
-        var _curTime = 0f;
-
-
-        while (_curTime < journeyTime)
-        {
-            _curTime += Time.deltaTime;
-
-            if (transform.position == sunset)
-            {
-                yield break;
-            }
-
-            Vector3 center = (sunrise + sunset) * 0.5F; //Center 값만큼 위로 올라간다.
-            center -= new Vector3(0, 1f * reduceHeight, 0); //y값을 높이면 높이가 낮아진다.
-
-            Vector3 riseRelCenter = sunrise - center;
-            Vector3 setRelCenter = sunset - center;
-
-            transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, _curTime / journeyTime);
-            transform.position += center;
-            yield return null;
-        }
-
-        playerState = DefineManager.PlayerState.Idle;
-    }
-    #endregion
-
 }
