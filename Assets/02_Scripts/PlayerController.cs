@@ -217,7 +217,6 @@ public class PlayerController : MonoBehaviour
     {
         if (hitInfo.collider == null || colString == "")
         {
-            Debug.Log("qwe");
             return;
         }
 
