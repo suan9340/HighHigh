@@ -136,11 +136,7 @@ public class PlayerController : MonoBehaviour
 
     private void DontShootLineRenderer()
     {
-        myLineRen.SetPosition(0, Vector3.zero);
-        myLineRen.SetPosition(1, Vector3.zero);
-
-        shootLine.SetPosition(0, Vector3.zero);
-        shootLine.SetPosition(1, Vector3.zero);
+        ResetLineRenderers(myLineRen);
 
         CircleParticle.SetActive(false);
         XParticle.SetActive(false);
@@ -262,9 +258,8 @@ public class PlayerController : MonoBehaviour
     {
         playerState = DefineManager.PlayerState.Moving;
 
-        SettingShootLine();
+        shootLine.SetPosition(0, hitInfo.point);
         var _curTime = 0f;
-
 
         while (_curTime < playerMoveTime)
         {
@@ -283,12 +278,10 @@ public class PlayerController : MonoBehaviour
 
             transform.position = Vector3.Slerp(riseRelCenter, setRelCenter, _curTime / playerMoveTime);
             transform.position += center;
-            shootLine.SetPosition(0, rayStartTrn.transform.position);
+            shootLine.SetPosition(1, rayStartTrn.transform.position);
             yield return null;
         }
 
-        shootLine.SetPosition(0, Vector3.zero);
-        shootLine.SetPosition(1, Vector3.zero);
 
         yield return PlayerRotationToEnemy();
     }
@@ -307,6 +300,7 @@ public class PlayerController : MonoBehaviour
         }
         playerState = DefineManager.PlayerState.Idle;
 
+        ResetLineRenderers(shootLine);
         yield return null;
     }
 
@@ -343,14 +337,11 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    #region Shoot a Line
-
-    private void SettingShootLine()
+    #region Etc
+    private void ResetLineRenderers(LineRenderer _rend)
     {
-        shootLine.positionCount = 2;
-        shootLine.SetPosition(0, rayStartTrn.transform.position);
-        shootLine.SetPosition(1, hitInfo.transform.position);
+        _rend.SetPosition(0, Vector3.zero);
+        _rend.SetPosition(1, Vector3.zero);
     }
-
     #endregion
 }
