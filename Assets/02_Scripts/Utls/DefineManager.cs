@@ -14,6 +14,7 @@ public class DefineManager : MonoBehaviour
     public enum GameState
     {
         Setting,
+        Menu,
         Playing,
         Quit,
     }
