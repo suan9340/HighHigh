@@ -17,7 +17,7 @@ public class LoadingSceneManager : MonoBehaviour
             if (_instance == null)
             {
                 var _obj = FindObjectOfType<LoadingSceneManager>();
-                if (_obj == null)
+                if (_obj != null)
                 {
                     _instance = _obj;
                 }
