@@ -120,7 +120,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 240024277443179962}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2925135415111633052}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: OnClickHero
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &240024277470256539
 GameObject:
   m_ObjectHideFlags: 0
@@ -289,6 +301,7 @@ GameObject:
   - component: {fileID: 240024277826095825}
   - component: {fileID: 240024277826095824}
   - component: {fileID: 240024277826095827}
+  - component: {fileID: 2925135415111633052}
   m_Layer: 5
   m_Name: Canvas (Menu)
   m_TagString: Untagged
@@ -383,6 +396,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &2925135415111633052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 240024277826095826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 280f6e73f81bf8b43b25a9b85bdcbef5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &240024277839769576
 GameObject:
   m_ObjectHideFlags: 0
@@ -539,7 +564,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 240024278005409844}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2925135415111633052}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: OnClickSetting
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &240024278186618644
 GameObject:
   m_ObjectHideFlags: 0
@@ -1052,7 +1089,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 240024279233202334}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2925135415111633052}
+        m_TargetAssemblyTypeName: MainMenu, Assembly-CSharp
+        m_MethodName: OnClickQuest
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &240024279354926389
 GameObject:
   m_ObjectHideFlags: 0

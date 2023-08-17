@@ -7,6 +7,7 @@ public class MenuManager : MonoBehaviour
 {
     [Header("---- Menus Prefabs ----")]
     public MainMenu mainMenu_prefab = null;
+    public SettingMenu setting_prefab = null;
 
     public Transform menuParaent_transform = null;
 

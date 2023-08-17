@@ -9,5 +9,19 @@ public class MainMenu : Menu<MainMenu>
         Debug.Log("Game Start");
     }
 
+    public void OnClickSetting()
+    {
+        SettingMenu.Open();
+    }
+
+    public void OnClickHero()
+    {
+        Debug.Log("Hero 누름");
+    }
+
+    public void OnClickQuest()
+    {
+        Debug.Log("Quest 누름");
+    }
 
 }

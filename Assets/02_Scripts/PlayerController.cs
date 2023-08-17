@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (playerState == DefineManager.PlayerState.Moving)
+        if (playerState == DefineManager.PlayerState.Moving || GameManager.Instance.gameState == DefineManager.GameState.Menu)
         {
             return;
         }
@@ -108,8 +108,8 @@ public class PlayerController : MonoBehaviour
 
     private void FirstSetting()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        //Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.visible = false;
 
         mainCam = Camera.main;
 
