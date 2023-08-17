@@ -25,15 +25,30 @@ public class SettingMenu : Menu<SettingMenu>
     {
         var _b = PlayerPrefs.GetInt(_st);
 
+
         if (_b == 0)
         {
             _img.sprite = switchs[0];
+            CheckBoolen(_st, true);
         }
         else
         {
             _img.sprite = switchs[1];
+            CheckBoolen(_st, false);
         }
 
+    }
+
+    private void CheckBoolen(string _str, bool _isbool)
+    {
+        if (_str == "SOUND_ONOFF")
+        {
+            isSoundOn = _isbool;
+        }
+        else
+        {
+            isHaptickOn = _isbool;
+        }
     }
 
     public void OnClickSound()
