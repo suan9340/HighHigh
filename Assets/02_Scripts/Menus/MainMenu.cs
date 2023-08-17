@@ -6,7 +6,9 @@ public class MainMenu : Menu<MainMenu>
 {
     public void OnClickGame()
     {
-        Debug.Log("Game Start");
+        Debug.Log("qwe");
+        base.OnClickBack();
+        GameManager.Instance.gameState = DefineManager.GameState.Playing;
     }
 
     public void OnClickSetting()

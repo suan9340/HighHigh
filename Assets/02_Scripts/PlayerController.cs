@@ -109,7 +109,7 @@ public class PlayerController : MonoBehaviour
     private void FirstSetting()
     {
         //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        //Cursor.visible = false;   
 
         mainCam = Camera.main;
 
